@@ -56,7 +56,8 @@
                 <div class="cursor-pointer bg-[#5c7a46] hover:bg-[#4a6338] text-white px-6 py-4 rounded-full shadow-lg transition-transform transform hover:scale-105 flex items-center justify-center gap-2 font-bold text-lg">
                     <i class="fas fa-camera text-xl"></i> 写真を撮る / 選ぶ
                 </div>
-                <input type="file" id="image-input" accept="image/*" capture="environment" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+                <!-- capture="environment" を削除し、スマホでもファイル選択メニューが出るように修正しました -->
+                <input type="file" id="image-input" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
             </div>
             
             <button id="btn-pdf" class="hidden bg-[#8c6b4a] hover:bg-[#73583d] text-white px-6 py-4 rounded-full shadow-lg transition-transform transform hover:scale-105 items-center justify-center gap-2 font-bold text-lg" onclick="saveAsPDF()">
