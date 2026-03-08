@@ -61,8 +61,9 @@
             </button>
         </div>
 
-        <div id="pdf-wrapper" class="bg-gray-200 shadow-xl mx-auto overflow-x-auto rounded-md border border-gray-300">
-            <div id="zukan-page" class="zukan-container border-[12px] border-[#8b7355] p-10 relative w-[800px] min-w-[800px] mx-auto">
+        <!-- 画面上はスマホ・PC両対応のレスポンシブな枠に戻しました -->
+        <div id="pdf-wrapper" class="bg-white shadow-xl mx-auto overflow-hidden rounded-md">
+            <div id="zukan-page" class="zukan-container border-[12px] border-[#8b7355] p-6 md:p-10 relative">
                 
                 <div class="absolute top-2 left-2 w-8 h-8 border-t-2 border-l-2 border-[#8b7355]"></div>
                 <div class="absolute top-2 right-2 w-8 h-8 border-t-2 border-r-2 border-[#8b7355]"></div>
@@ -78,13 +79,14 @@
                 </div>
 
                 <div id="zukan-content" class="hidden flex-col gap-8">
-                    <div class="flex flex-row gap-8 items-start border-b-2 border-dashed border-[#d4c3b3] pb-8">
-                        <div class="w-56 h-56 flex-shrink-0 border-4 border-white shadow-md bg-white p-2 transform rotate-[-2deg]">
+                    <!-- flex-col md:flex-row でスマホでは縦並び、PCでは横並びになるようにしました -->
+                    <div class="flex flex-col md:flex-row gap-8 items-center md:items-start border-b-2 border-dashed border-[#d4c3b3] pb-8">
+                        <div class="w-48 h-48 md:w-56 md:h-56 flex-shrink-0 border-4 border-white shadow-md bg-white p-2 transform rotate-[-2deg]">
                             <img id="preview-image" class="w-full h-full object-contain" src="" alt="Supplement Image">
                         </div>
-                        <div class="flex-grow text-left w-full">
+                        <div class="flex-grow text-center md:text-left w-full">
                             <h2 class="text-xs font-bold text-gray-400 tracking-[0.2em] mb-2 serif uppercase">Supplement Directory No.<span id="random-id">001</span></h2>
-                            <h1 id="zukan-name" class="text-4xl font-bold text-[#4a3f35] serif leading-tight mb-4 border-b-2 border-[#4a3f35] inline-block pb-2">サプリメント名</h1>
+                            <h1 id="zukan-name" class="text-3xl md:text-4xl font-bold text-[#4a3f35] serif leading-tight mb-4 border-b-2 border-[#4a3f35] inline-block pb-2">サプリメント名</h1>
                             
                             <div class="mb-4 bg-white border border-[#e2d5c4] rounded-md p-3 text-sm flex items-start gap-3 text-gray-700 shadow-sm text-left">
                                 <i class="fas fa-pills text-[#8c6b4a] mt-0.5 text-lg"></i>
@@ -99,7 +101,7 @@
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="bg-white/80 p-5 border border-[#e2d5c4] shadow-sm relative">
                             <h3 class="text-xl font-bold text-[#5c7a46] border-b-2 border-[#5c7a46] pb-2 mb-4 flex items-center gap-2 serif">
                                 <i class="fas fa-leaf opacity-80"></i> 主な効能・働き
@@ -118,7 +120,7 @@
                         <h3 class="text-xl font-bold text-[#8c6b4a] border-b-2 border-[#8c6b4a] pb-2 mb-5 flex items-center gap-2 serif">
                             <i class="fas fa-comments opacity-80"></i> ネット上の一般的な口コミ・評判
                         </h3>
-                        <div class="grid grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="bg-green-50/50 p-4 rounded border border-green-100">
                                 <h4 class="font-bold text-green-700 mb-3 flex items-center gap-1">
                                     <i class="fas fa-thumbs-up"></i> 評価されている点
@@ -175,7 +177,6 @@
     </div>
 
 <script>
-    // 実行環境によって注入されるAPIキー。指示通り空文字列で初期化
     const apiKey = ""; 
     let customApiKey = localStorage.getItem('supplement_api_key') || "";
     let customModel = localStorage.getItem('supplement_api_model') || "";
@@ -240,13 +241,12 @@
                 canvas.height = img.height * scale;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            // Gemini APIはPNGまたはJPEGをサポート。ここではPNGを使用
-            resolve(canvas.toDataURL('image/png').split(',')[1]);
-        };
-        img.onerror = reject;
-        img.src = url;
-    });
-}
+                resolve(canvas.toDataURL('image/png').split(',')[1]);
+            };
+            img.onerror = reject;
+            img.src = url;
+        });
+    }
 
     async function processImage(file) {
         document.getElementById('error-message').classList.add('hidden');
@@ -259,11 +259,6 @@
             document.getElementById('preview-image').src = `data:image/png;base64,${base64Data}`;
             
             const activeKey = customApiKey || apiKey;
-            
-            // モデルの決定ロジック：
-            // 1. ユーザーが手動入力したモデルがあればそれを使う
-            // 2. ユーザーが自身のAPIキーを入れている場合は一般的な安定版「gemini-2.5-flash」を使う
-            // 3. どちらもない場合はデフォルトのプレビュー専用モデルを使う
             let model = "gemini-2.5-flash-preview-09-2025";
             if (customModel) {
                 model = customModel;
@@ -351,11 +346,29 @@
             overlay.classList.remove('hidden');
             overlay.classList.add('flex');
 
-            // html2canvasで描画。背景色を指定して確実に反映
+            // ローディング画面を表示させるためのわずかな待機時間
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            // html2canvasの内部クローン機能を利用して、PDF出力時だけPCレイアウトを適用
             const canvas = await html2canvas(element, { 
                 scale: 2,
                 useCORS: true,
-                backgroundColor: '#fdfbf7'
+                backgroundColor: '#fdfbf7',
+                windowWidth: 1024, // PCサイズのメディアクエリを強制適用
+                onclone: (clonedDoc) => {
+                    // キャプチャ用の裏画面のみ、要素の幅をPCサイズ(800px)に固定して余白を調整
+                    const style = clonedDoc.createElement('style');
+                    style.innerHTML = `
+                        #zukan-page { 
+                            width: 800px !important; 
+                            min-width: 800px !important; 
+                            max-width: 800px !important; 
+                            margin: 0 !important; 
+                            padding: 40px !important;
+                        }
+                    `;
+                    clonedDoc.head.appendChild(style);
+                }
             });
             
             const imgData = canvas.toDataURL('image/jpeg', 0.9);
