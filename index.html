@@ -48,7 +48,7 @@
 
     <main class="container mx-auto px-4 max-w-4xl">
         
-        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+        <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center mb-8">
             <div class="relative overflow-hidden inline-block w-full sm:w-auto">
                 <div class="cursor-pointer bg-[#5c7a46] hover:bg-[#4a6338] text-white px-6 py-4 rounded-full shadow-lg transition-transform transform hover:scale-105 flex items-center justify-center gap-2 font-bold text-lg">
                     <i class="fas fa-camera text-xl"></i> 写真を撮る / 選ぶ
@@ -56,6 +56,10 @@
                 <input type="file" id="image-input" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
             </div>
             
+            <button id="btn-reload" class="hidden bg-[#4a6b8c] hover:bg-[#3a546d] text-white px-6 py-4 rounded-full shadow-lg transition-transform transform hover:scale-105 items-center justify-center gap-2 font-bold text-lg" onclick="reloadImage()">
+                <i class="fas fa-sync-alt text-xl"></i> 再度解析する
+            </button>
+
             <button id="btn-pdf" class="hidden bg-[#8c6b4a] hover:bg-[#73583d] text-white px-6 py-4 rounded-full shadow-lg transition-transform transform hover:scale-105 items-center justify-center gap-2 font-bold text-lg" onclick="saveAsPDF()">
                 <i class="fas fa-file-pdf text-xl"></i> 図鑑をPDFに保存
             </button>
@@ -180,6 +184,7 @@
     const apiKey = ""; 
     let customApiKey = localStorage.getItem('supplement_api_key') || "";
     let customModel = localStorage.getItem('supplement_api_model') || "";
+    let currentImageFile = null;
 
     window.addEventListener('DOMContentLoaded', () => {
         if (customApiKey) {
@@ -326,15 +331,26 @@
         document.getElementById('zukan-placeholder').classList.add('hidden');
         document.getElementById('zukan-content').classList.remove('hidden');
         document.getElementById('zukan-content').classList.add('flex');
+        document.getElementById('btn-reload').classList.remove('hidden');
+        document.getElementById('btn-reload').classList.add('flex');
         document.getElementById('btn-pdf').classList.remove('hidden');
         document.getElementById('btn-pdf').classList.add('flex');
     }
 
     document.getElementById('image-input').addEventListener('change', e => {
         if (e.target.files && e.target.files[0]) {
-            processImage(e.target.files[0]);
+            currentImageFile = e.target.files[0];
+            processImage(currentImageFile);
         }
     });
+
+    function reloadImage() {
+        if (currentImageFile) {
+            processImage(currentImageFile);
+        } else {
+            showToast("画像がありません。もう一度写真を選択してください。");
+        }
+    }
 
     async function saveAsPDF() {
         const element = document.getElementById('zukan-page');
