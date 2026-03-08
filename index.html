@@ -20,30 +20,15 @@
             font-family: 'Noto Serif JP', serif; 
         }
         
-        /* Book page styling */
         .zukan-container {
             background-color: #fdfbf7;
             background-image: radial-gradient(#e5d9c5 1px, transparent 1px);
             background-size: 20px 20px;
         }
         
-        /* Custom scrollbar for mobile preview if needed */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #c5bba8; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #a69b88; }
-
-        /* PDF出力時（クローン）にPC版のA4比率レイアウトを強制するスタイル */
-        .pdf-export-mode {
-            width: 800px !important;
-            max-width: none !important;
-        }
-        .pdf-export-mode .pdf-row { flex-direction: row !important; }
-        .pdf-export-mode .pdf-items-start { align-items: flex-start !important; }
-        .pdf-export-mode .pdf-img-size { width: 14rem !important; height: 14rem !important; }
-        .pdf-export-mode .pdf-text-left { text-align: left !important; }
-        .pdf-export-mode .pdf-title-size { font-size: 2.25rem !important; line-height: 2.5rem !important; }
-        .pdf-export-mode .pdf-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
     </style>
 </head>
 <body class="min-h-screen pb-12 text-gray-800">
@@ -76,8 +61,8 @@
             </button>
         </div>
 
-        <div id="pdf-wrapper" class="bg-white shadow-xl mx-auto overflow-hidden rounded-md">
-            <div id="zukan-page" class="zukan-container border-[12px] border-[#8b7355] p-6 md:p-10 relative">
+        <div id="pdf-wrapper" class="bg-gray-200 shadow-xl mx-auto overflow-x-auto rounded-md border border-gray-300">
+            <div id="zukan-page" class="zukan-container border-[12px] border-[#8b7355] p-10 relative w-[800px] min-w-[800px] mx-auto">
                 
                 <div class="absolute top-2 left-2 w-8 h-8 border-t-2 border-l-2 border-[#8b7355]"></div>
                 <div class="absolute top-2 right-2 w-8 h-8 border-t-2 border-r-2 border-[#8b7355]"></div>
@@ -93,14 +78,13 @@
                 </div>
 
                 <div id="zukan-content" class="hidden flex-col gap-8">
-                    <!-- スマホでのPDF出力時にもPCレイアウトを維持するための pdf-row などのクラスを追加 -->
-                    <div class="flex flex-col md:flex-row pdf-row gap-8 items-center md:items-start pdf-items-start border-b-2 border-dashed border-[#d4c3b3] pb-8">
-                        <div class="w-48 h-48 md:w-56 md:h-56 pdf-img-size flex-shrink-0 border-4 border-white shadow-md bg-white p-2 transform rotate-[-2deg]">
+                    <div class="flex flex-row gap-8 items-start border-b-2 border-dashed border-[#d4c3b3] pb-8">
+                        <div class="w-56 h-56 flex-shrink-0 border-4 border-white shadow-md bg-white p-2 transform rotate-[-2deg]">
                             <img id="preview-image" class="w-full h-full object-contain" src="" alt="Supplement Image">
                         </div>
-                        <div class="flex-grow text-center md:text-left pdf-text-left w-full">
+                        <div class="flex-grow text-left w-full">
                             <h2 class="text-xs font-bold text-gray-400 tracking-[0.2em] mb-2 serif uppercase">Supplement Directory No.<span id="random-id">001</span></h2>
-                            <h1 id="zukan-name" class="text-3xl md:text-4xl pdf-title-size font-bold text-[#4a3f35] serif leading-tight mb-4 border-b-2 border-[#4a3f35] inline-block pb-2">サプリメント名</h1>
+                            <h1 id="zukan-name" class="text-4xl font-bold text-[#4a3f35] serif leading-tight mb-4 border-b-2 border-[#4a3f35] inline-block pb-2">サプリメント名</h1>
                             
                             <div class="mb-4 bg-white border border-[#e2d5c4] rounded-md p-3 text-sm flex items-start gap-3 text-gray-700 shadow-sm text-left">
                                 <i class="fas fa-pills text-[#8c6b4a] mt-0.5 text-lg"></i>
@@ -115,7 +99,7 @@
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 pdf-grid-2 gap-6">
+                    <div class="grid grid-cols-2 gap-6">
                         <div class="bg-white/80 p-5 border border-[#e2d5c4] shadow-sm relative">
                             <h3 class="text-xl font-bold text-[#5c7a46] border-b-2 border-[#5c7a46] pb-2 mb-4 flex items-center gap-2 serif">
                                 <i class="fas fa-leaf opacity-80"></i> 主な効能・働き
@@ -134,7 +118,7 @@
                         <h3 class="text-xl font-bold text-[#8c6b4a] border-b-2 border-[#8c6b4a] pb-2 mb-5 flex items-center gap-2 serif">
                             <i class="fas fa-comments opacity-80"></i> ネット上の一般的な口コミ・評判
                         </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 pdf-grid-2 gap-6">
+                        <div class="grid grid-cols-2 gap-6">
                             <div class="bg-green-50/50 p-4 rounded border border-green-100">
                                 <h4 class="font-bold text-green-700 mb-3 flex items-center gap-1">
                                     <i class="fas fa-thumbs-up"></i> 評価されている点
@@ -158,8 +142,10 @@
     <div id="api-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex justify-center items-center">
         <div class="bg-white p-6 rounded-lg shadow-xl w-11/12 max-w-md">
             <h3 class="font-bold text-lg mb-3 text-[#4a3f35] border-b pb-2"><i class="fas fa-key text-[#8c6b4a]"></i> 詳細設定</h3>
-            <p class="text-xs text-gray-600 mb-4 leading-relaxed">Gemini APIキーを入力してください。</p>
+            <p class="text-xs text-gray-600 mb-2 leading-relaxed">Gemini APIキーを入力してください。</p>
             <input type="password" id="api-key-input" class="border border-gray-300 p-3 w-full rounded focus:outline-none focus:border-[#5c7a46] mb-4 text-sm" placeholder="AIzaSy...">
+            <p class="text-xs text-gray-600 mb-2 leading-relaxed">使用するモデル（任意・通常は変更不要）</p>
+            <input type="text" id="model-input" class="border border-gray-300 p-3 w-full rounded focus:outline-none focus:border-[#5c7a46] mb-4 text-sm" placeholder="gemini-2.5-flash">
             <div class="flex justify-end gap-3">
                 <button onclick="document.getElementById('api-modal').classList.add('hidden')" class="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm font-bold">閉じる</button>
                 <button onclick="setApiKey()" class="px-4 py-2 bg-[#5c7a46] text-white rounded hover:bg-[#4a6338] text-sm font-bold">設定を保存</button>
@@ -189,15 +175,30 @@
     </div>
 
 <script>
-    let apiKey = ""; 
+    // 実行環境によって注入されるAPIキー。指示通り空文字列で初期化
+    const apiKey = ""; 
+    let customApiKey = localStorage.getItem('supplement_api_key') || "";
+    let customModel = localStorage.getItem('supplement_api_model') || "";
 
     window.addEventListener('DOMContentLoaded', () => {
-        const savedKey = localStorage.getItem('supplement_api_key');
-        if (savedKey) {
-            apiKey = savedKey;
-            document.getElementById('api-key-input').value = savedKey;
+        if (customApiKey) {
+            document.getElementById('api-key-input').value = customApiKey;
+        }
+        if (customModel) {
+            document.getElementById('model-input').value = customModel;
         }
     });
+
+    function setApiKey() {
+        const keyVal = document.getElementById('api-key-input').value.trim();
+        const modelVal = document.getElementById('model-input').value.trim();
+        customApiKey = keyVal;
+        customModel = modelVal;
+        localStorage.setItem('supplement_api_key', keyVal);
+        localStorage.setItem('supplement_api_model', modelVal);
+        document.getElementById('api-modal').classList.add('hidden');
+        showToast("設定を保存しました");
+    }
 
     function showToast(msg) {
         const toast = document.getElementById('toast-message');
@@ -210,25 +211,19 @@
         }, 3000);
     }
 
-    function setApiKey() {
-        const val = document.getElementById('api-key-input').value.trim();
-        if(val) {
-            apiKey = val;
-            localStorage.setItem('supplement_api_key', val);
-            showToast("APIキーを保存しました！");
-        }
-        document.getElementById('api-modal').classList.add('hidden');
-    }
-
-    async function fetchWithRetry(url, options, maxRetries = 2) {
+    async function fetchWithRetry(url, options, maxRetries = 5) {
+        const delays = [1000, 2000, 4000, 8000, 16000];
         for (let i = 0; i < maxRetries; i++) {
             try {
                 const response = await fetch(url, options);
-                if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+                if (!response.ok) {
+                    const errorBody = await response.text();
+                    throw new Error(`HTTP Error ${response.status}: ${errorBody}`);
+                }
                 return await response.json();
             } catch (e) {
                 if (i === maxRetries - 1) throw e;
-                await new Promise(r => setTimeout(r, 1000 * (i + 1)));
+                await new Promise(r => setTimeout(r, delays[i]));
             }
         }
     }
@@ -240,50 +235,66 @@
             img.onload = () => {
                 URL.revokeObjectURL(url);
                 const canvas = document.createElement('canvas');
-                const scale = Math.min(500 / img.width, 500 / img.height, 1);
+                const scale = Math.min(800 / img.width, 800 / img.height, 1);
                 canvas.width = img.width * scale;
                 canvas.height = img.height * scale;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                resolve(canvas.toDataURL('image/jpeg', 0.6).split(',')[1]);
-            };
-            img.onerror = reject;
-            img.src = url;
-        });
-    }
+            // Gemini APIはPNGまたはJPEGをサポート。ここではPNGを使用
+            resolve(canvas.toDataURL('image/png').split(',')[1]);
+        };
+        img.onerror = reject;
+        img.src = url;
+    });
+}
 
     async function processImage(file) {
-        document.getElementById('zukan-placeholder').classList.add('hidden');
-        document.getElementById('zukan-content').classList.remove('hidden');
-        document.getElementById('zukan-content').classList.add('flex');
-        document.getElementById('loading-overlay').classList.remove('hidden');
-        document.getElementById('loading-overlay').classList.add('flex');
+        document.getElementById('error-message').classList.add('hidden');
+        const overlay = document.getElementById('loading-overlay');
+        overlay.classList.remove('hidden');
+        overlay.classList.add('flex');
 
         try {
             const base64Data = await compressImageToBase64(file);
-            document.getElementById('preview-image').src = `data:image/jpeg;base64,${base64Data}`;
+            document.getElementById('preview-image').src = `data:image/png;base64,${base64Data}`;
             
-            // 指定されたモデル名 gemini-2.5-flash を使用
-            const isCustomKey = apiKey !== "";
-            const modelName = isCustomKey ? "gemini-2.5-flash" : "gemini-2.5-flash-preview-09-2025";
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+            const activeKey = customApiKey || apiKey;
             
-            const prompt = `サプリ画像を解析しJSONで出力せよ。商品名、目安量、効能、主要成分、口コミ(良い2点、悪い2点)を必ず全項目埋めること。
-1. name: 商品名
-2. usage: 目安量(推測)
-3. benefits: 効能(ARRAY)
-4. ingredients: 主要成分(ARRAY)
-5. reviews_positive: 良い口コミ(ARRAY)
-6. reviews_negative: 注意点(ARRAY)`;
-
+            // モデルの決定ロジック：
+            // 1. ユーザーが手動入力したモデルがあればそれを使う
+            // 2. ユーザーが自身のAPIキーを入れている場合は一般的な安定版「gemini-2.5-flash」を使う
+            // 3. どちらもない場合はデフォルトのプレビュー専用モデルを使う
+            let model = "gemini-2.5-flash-preview-09-2025";
+            if (customModel) {
+                model = customModel;
+            } else if (customApiKey) {
+                model = "gemini-2.5-flash";
+            }
+            
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${activeKey}`;
+            
             const payload = {
                 contents: [{
                     parts: [
-                        { text: prompt },
-                        { inlineData: { mimeType: 'image/jpeg', data: base64Data } }
+                        { text: "サプリのパッケージ画像を解析し、商品名(name)、目安量(usage)、働き(benefits:配列)、主要成分(ingredients:配列)、良い口コミ(reviews_positive:配列)、注意点(reviews_negative:配列)をJSON形式で出力してください。不明な項目も空にせず推測して埋めてください。" },
+                        { inlineData: { mimeType: "image/png", data: base64Data } }
                     ]
                 }],
-                generationConfig: { responseMimeType: "application/json" }
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            name: { type: "STRING" },
+                            usage: { type: "STRING" },
+                            benefits: { type: "ARRAY", items: { type: "STRING" } },
+                            ingredients: { type: "ARRAY", items: { type: "STRING" } },
+                            reviews_positive: { type: "ARRAY", items: { type: "STRING" } },
+                            reviews_negative: { type: "ARRAY", items: { type: "STRING" } }
+                        },
+                        required: ["name", "usage", "benefits", "ingredients", "reviews_positive", "reviews_negative"]
+                    }
+                }
             };
 
             const result = await fetchWithRetry(url, {
@@ -292,73 +303,92 @@
                 body: JSON.stringify(payload)
             });
 
-            const data = JSON.parse(result.candidates[0].content.parts[0].text);
+            const responseText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (!responseText) throw new Error("AIからの応答が取得できませんでした。");
+            
+            const data = JSON.parse(responseText);
             updateUI(data);
             
         } catch (error) {
-            document.getElementById('error-text').innerText = error.message;
+            console.error("解析エラー:", error);
+            document.getElementById('error-text').innerText = "解析に失敗しました。APIキーが有効であるか、モデルの権限があるか確認してください。\n" + error.message;
             document.getElementById('error-message').classList.remove('hidden');
         } finally {
-            document.getElementById('loading-overlay').classList.add('hidden');
+            overlay.classList.add('hidden');
+            overlay.classList.remove('flex');
         }
     }
 
     function updateUI(data) {
         document.getElementById('random-id').innerText = Math.floor(Math.random() * 900 + 100);
-        document.getElementById('zukan-name').innerText = data.name;
-        document.getElementById('zukan-usage').innerText = data.usage;
-        document.getElementById('zukan-benefits-list').innerHTML = data.benefits.map(i => `<li class="text-sm">・${i}</li>`).join('');
-        document.getElementById('zukan-ingredients-list').innerHTML = data.ingredients.map(i => `<li class="text-sm">・${i}</li>`).join('');
-        document.getElementById('zukan-positive-list').innerHTML = data.reviews_positive.map(i => `<li class="text-sm">・${i}</li>`).join('');
-        document.getElementById('zukan-negative-list').innerHTML = data.reviews_negative.map(i => `<li class="text-sm">・${i}</li>`).join('');
+        document.getElementById('zukan-name').innerText = data.name || "サプリメント";
+        document.getElementById('zukan-usage').innerText = data.usage || "目安量不明";
+        document.getElementById('zukan-benefits-list').innerHTML = (data.benefits || []).map(i => `<li>・${i}</li>`).join('') || "<li>・記載なし</li>";
+        document.getElementById('zukan-ingredients-list').innerHTML = (data.ingredients || []).map(i => `<li>・${i}</li>`).join('') || "<li>・記載なし</li>";
+        document.getElementById('zukan-positive-list').innerHTML = (data.reviews_positive || []).map(i => `<li>・${i}</li>`).join('') || "<li>・記載なし</li>";
+        document.getElementById('zukan-negative-list').innerHTML = (data.reviews_negative || []).map(i => `<li>・${i}</li>`).join('') || "<li>・記載なし</li>";
+        
+        document.getElementById('zukan-placeholder').classList.add('hidden');
+        document.getElementById('zukan-content').classList.remove('hidden');
+        document.getElementById('zukan-content').classList.add('flex');
         document.getElementById('btn-pdf').classList.remove('hidden');
         document.getElementById('btn-pdf').classList.add('flex');
     }
 
+    document.getElementById('image-input').addEventListener('change', e => {
+        if (e.target.files && e.target.files[0]) {
+            processImage(e.target.files[0]);
+        }
+    });
+
     async function saveAsPDF() {
-        const element = document.getElementById('pdf-wrapper');
-        
-        // 画面外クローン方式はスマホで失敗しやすいため、
-        // 元の要素に一瞬だけPC版レイアウトを強制適用してキャプチャします
-        element.classList.add('pdf-export-mode');
+        const element = document.getElementById('zukan-page');
+        const overlay = document.getElementById('loading-overlay');
+        const msg = document.getElementById('loading-message');
         
         try {
-            // スタイルが完全に適用されるまでほんの少し待機
-            await new Promise(resolve => setTimeout(resolve, 50));
-            
+            msg.innerText = "PDF作成中...";
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+
+            // html2canvasで描画。背景色を指定して確実に反映
             const canvas = await html2canvas(element, { 
                 scale: 2,
-                windowWidth: 800
+                useCORS: true,
+                backgroundColor: '#fdfbf7'
             });
             
-            const imgData = canvas.toDataURL('image/jpeg', 1.0);
+            const imgData = canvas.toDataURL('image/jpeg', 0.9);
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('p', 'mm', 'a4');
             
             const margin = 10;
-            const maxW = 210 - margin * 2;
-            const maxH = 297 - margin * 2;
+            const pdfWidth = 210;
+            const pdfHeight = 297;
+            const maxWidth = pdfWidth - margin * 2;
+            const maxHeight = pdfHeight - margin * 2;
             
-            let imgW = maxW;
+            let imgW = maxWidth;
             let imgH = imgW * (canvas.height / canvas.width);
             
-            if (imgH > maxH) {
-                imgH = maxH;
+            if (imgH > maxHeight) {
+                imgH = maxHeight;
                 imgW = imgH * (canvas.width / canvas.height);
             }
             
-            const x = margin + (maxW - imgW) / 2;
-            const y = margin + (maxH - imgH) / 2;
+            const x = (pdfWidth - imgW) / 2;
+            const y = (pdfHeight - imgH) / 2;
             
             pdf.addImage(imgData, 'JPEG', x, y, imgW, imgH);
             pdf.save("サプリ図鑑.pdf");
+            
         } catch (error) {
-            console.error("PDF生成エラー:", error);
-            document.getElementById('error-text').innerText = "PDFの保存に失敗しました。";
-            document.getElementById('error-message').classList.remove('hidden');
+            console.error("PDF保存エラー:", error);
+            showToast("PDFの作成に失敗しました。");
         } finally {
-            // キャプチャが終わったら（成功しても失敗しても）すぐに元のスマホレイアウトに戻す
-            element.classList.remove('pdf-export-mode');
+            overlay.classList.add('hidden');
+            overlay.classList.remove('flex');
+            msg.innerText = "解析中...";
         }
     }
 </script>
