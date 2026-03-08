@@ -32,6 +32,18 @@
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #c5bba8; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #a69b88; }
+
+        /* PDF出力時（クローン）にPC版のA4比率レイアウトを強制するスタイル */
+        .pdf-export-mode {
+            width: 800px !important;
+            max-width: none !important;
+        }
+        .pdf-export-mode .pdf-row { flex-direction: row !important; }
+        .pdf-export-mode .pdf-items-start { align-items: flex-start !important; }
+        .pdf-export-mode .pdf-img-size { width: 14rem !important; height: 14rem !important; }
+        .pdf-export-mode .pdf-text-left { text-align: left !important; }
+        .pdf-export-mode .pdf-title-size { font-size: 2.25rem !important; line-height: 2.5rem !important; }
+        .pdf-export-mode .pdf-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
     </style>
 </head>
 <body class="min-h-screen pb-12 text-gray-800">
@@ -81,13 +93,14 @@
                 </div>
 
                 <div id="zukan-content" class="hidden flex-col gap-8">
-                    <div class="flex flex-col md:flex-row gap-8 items-center md:items-start border-b-2 border-dashed border-[#d4c3b3] pb-8">
-                        <div class="w-48 h-48 md:w-56 md:h-56 flex-shrink-0 border-4 border-white shadow-md bg-white p-2 transform rotate-[-2deg]">
+                    <!-- スマホでのPDF出力時にもPCレイアウトを維持するための pdf-row などのクラスを追加 -->
+                    <div class="flex flex-col md:flex-row pdf-row gap-8 items-center md:items-start pdf-items-start border-b-2 border-dashed border-[#d4c3b3] pb-8">
+                        <div class="w-48 h-48 md:w-56 md:h-56 pdf-img-size flex-shrink-0 border-4 border-white shadow-md bg-white p-2 transform rotate-[-2deg]">
                             <img id="preview-image" class="w-full h-full object-contain" src="" alt="Supplement Image">
                         </div>
-                        <div class="flex-grow text-center md:text-left w-full">
+                        <div class="flex-grow text-center md:text-left pdf-text-left w-full">
                             <h2 class="text-xs font-bold text-gray-400 tracking-[0.2em] mb-2 serif uppercase">Supplement Directory No.<span id="random-id">001</span></h2>
-                            <h1 id="zukan-name" class="text-3xl md:text-4xl font-bold text-[#4a3f35] serif leading-tight mb-4 border-b-2 border-[#4a3f35] inline-block pb-2">サプリメント名</h1>
+                            <h1 id="zukan-name" class="text-3xl md:text-4xl pdf-title-size font-bold text-[#4a3f35] serif leading-tight mb-4 border-b-2 border-[#4a3f35] inline-block pb-2">サプリメント名</h1>
                             
                             <div class="mb-4 bg-white border border-[#e2d5c4] rounded-md p-3 text-sm flex items-start gap-3 text-gray-700 shadow-sm text-left">
                                 <i class="fas fa-pills text-[#8c6b4a] mt-0.5 text-lg"></i>
@@ -102,7 +115,7 @@
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 pdf-grid-2 gap-6">
                         <div class="bg-white/80 p-5 border border-[#e2d5c4] shadow-sm relative">
                             <h3 class="text-xl font-bold text-[#5c7a46] border-b-2 border-[#5c7a46] pb-2 mb-4 flex items-center gap-2 serif">
                                 <i class="fas fa-leaf opacity-80"></i> 主な効能・働き
@@ -121,7 +134,7 @@
                         <h3 class="text-xl font-bold text-[#8c6b4a] border-b-2 border-[#8c6b4a] pb-2 mb-5 flex items-center gap-2 serif">
                             <i class="fas fa-comments opacity-80"></i> ネット上の一般的な口コミ・評判
                         </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 pdf-grid-2 gap-6">
                             <div class="bg-green-50/50 p-4 rounded border border-green-100">
                                 <h4 class="font-bold text-green-700 mb-3 flex items-center gap-1">
                                     <i class="fas fa-thumbs-up"></i> 評価されている点
@@ -302,39 +315,50 @@
         document.getElementById('btn-pdf').classList.add('flex');
     }
 
-    document.getElementById('image-input').addEventListener('change', e => {
-        if (e.target.files[0]) processImage(e.target.files[0]);
-    });
-
     async function saveAsPDF() {
-        const element = document.getElementById('pdf-wrapper');
-        const canvas = await html2canvas(element, { scale: 2 });
+        const originalElement = document.getElementById('pdf-wrapper');
+        
+        // 画面のチラつきを防ぐため、要素を複製して画面外に配置します
+        const clone = originalElement.cloneNode(true);
+        const container = document.createElement('div');
+        container.style.position = 'absolute';
+        container.style.top = '-9999px';
+        container.style.left = '-9999px';
+        document.body.appendChild(container);
+        
+        // 複製した要素に、強制的にPC版（A4比率）のレイアウトを適用するクラスを付与
+        clone.classList.add('pdf-export-mode');
+        container.appendChild(clone);
+        
+        // PCサイズのウィンドウ幅を指定してキャプチャ
+        const canvas = await html2canvas(clone, { 
+            scale: 2,
+            windowWidth: 800
+        });
+        
+        // 複製した要素を削除して後片付け
+        document.body.removeChild(container);
+
         const imgData = canvas.toDataURL('image/jpeg', 1.0);
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
         
-        // --- ここから修正 ---
         const margin = 10;
         const maxW = 210 - margin * 2;
         const maxH = 297 - margin * 2;
         
-        // まず幅を基準に合わせて高さを計算
         let imgW = maxW;
         let imgH = imgW * (canvas.height / canvas.width);
         
-        // 高さがA4サイズを超える場合は、高さに合わせて幅を縮小
         if (imgH > maxH) {
             imgH = maxH;
             imgW = imgH * (canvas.width / canvas.height);
         }
         
-        // 用紙の中央に配置するためのオフセット計算
         const x = margin + (maxW - imgW) / 2;
         const y = margin + (maxH - imgH) / 2;
         
         pdf.addImage(imgData, 'JPEG', x, y, imgW, imgH);
-        // --- 修正ここまで ---
-        
         pdf.save("サプリ図鑑.pdf");
     }
 </script>
