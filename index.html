@@ -65,7 +65,6 @@
             </button>
         </div>
 
-        <!-- 画面上はスマホ・PC両対応のレスポンシブな枠に戻しました -->
         <div id="pdf-wrapper" class="bg-white shadow-xl mx-auto overflow-hidden rounded-md">
             <div id="zukan-page" class="zukan-container border-[12px] border-[#8b7355] p-6 md:p-10 relative">
                 
@@ -83,7 +82,6 @@
                 </div>
 
                 <div id="zukan-content" class="hidden flex-col gap-8">
-                    <!-- flex-col md:flex-row でスマホでは縦並び、PCでは横並びになるようにしました -->
                     <div class="flex flex-col md:flex-row gap-8 items-center md:items-start border-b-2 border-dashed border-[#d4c3b3] pb-8">
                         <div class="w-48 h-48 md:w-56 md:h-56 flex-shrink-0 border-4 border-white shadow-md bg-white p-2 transform rotate-[-2deg]">
                             <img id="preview-image" class="w-full h-full object-contain" src="" alt="Supplement Image">
@@ -357,6 +355,14 @@
         const overlay = document.getElementById('loading-overlay');
         const msg = document.getElementById('loading-message');
         
+        // --- 修正部分：サプリメント名を取得してファイル名に設定 ---
+        let supplementName = document.getElementById('zukan-name').innerText;
+        // OSのファイル名に使えない文字をアンダースコアに置換
+        supplementName = supplementName.replace(/[\\/:*?"<>|]/g, '_').trim();
+        // 名前が取得できない場合はデフォルト名を設定
+        const fileName = supplementName ? `${supplementName}.pdf` : "サプリ図鑑.pdf";
+        // -----------------------------------------------------------
+
         try {
             msg.innerText = "PDF作成中...";
             overlay.classList.remove('hidden');
@@ -409,7 +415,9 @@
             const y = (pdfHeight - imgH) / 2;
             
             pdf.addImage(imgData, 'JPEG', x, y, imgW, imgH);
-            pdf.save("サプリ図鑑.pdf");
+            
+            // 修正部分：取得したサプリ名で保存
+            pdf.save(fileName);
             
         } catch (error) {
             console.error("PDF保存エラー:", error);
